@@ -3,12 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Awesomecorp.Integration
+namespace Awesomecorp.Integration.ExcelWriter
 {
-    public class ExcelListWriter<T>
+    public interface IExcelListWriter<T>
+    {
+        public IXLWorkbook Write(IEnumerable<T> datasoure);
+    }
+
+    public class ExcelListWriter<T> : IExcelListWriter<T>
     {
         public ExcelListWriter(
-            IHeaderWriter<T> headerWriter, 
+            IExcelHeaderWriter<T> headerWriter,
             IExcelRowWriter<T> excelRowWriter)
         {
             HeaderWriter = headerWriter;
@@ -16,23 +21,23 @@ namespace Awesomecorp.Integration
 
         }
 
-        private IHeaderWriter<T> HeaderWriter { get; }
+        private IExcelHeaderWriter<T> HeaderWriter { get; }
         private IExcelRowWriter<T> ExcelRowWriter { get; }
-        
 
 
-        public XLWorkbook Write(IEnumerable<T> datasoure)
+
+        public IXLWorkbook Write(IEnumerable<T> datasoure)
         {
-            using(var workbook = new XLWorkbook())
-            {
-                
-                var workSheet = workbook.AddWorksheet();
-                HeaderWriter.WriteHeader(workbook);
-                WriteAllRows(workSheet, datasoure);
-                
-                return workbook;
-            }
-            
+            var workbook = new XLWorkbook();
+
+
+            var workSheet = workbook.AddWorksheet("test");
+
+            HeaderWriter.WriteHeader(workSheet);
+            WriteAllRows(workSheet, datasoure);
+            return workbook;
+
+
         }
 
         private void WriteAllRows(IXLWorksheet worksheet, IEnumerable<T> datasoure)
@@ -43,7 +48,7 @@ namespace Awesomecorp.Integration
                 ExcelRowWriter.WriteRow(worksheet, item, row);
                 row++;
             }
-            
+
         }
     }
 }

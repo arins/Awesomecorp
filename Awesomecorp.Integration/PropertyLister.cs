@@ -6,7 +6,17 @@ using System.Text;
 
 namespace Awesomecorp.Integration
 {
-    public class PropertyLister<T>
+
+    public interface IPropertyLister<T>
+    {
+        public IEnumerable<PropertyInfo> Properties { get;  }
+        public void Load();
+    }
+    /// <summary>
+    /// List Properties of Type T
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class PropertyLister<T> : IPropertyLister<T>
     {
 
         public IEnumerable<PropertyInfo> Properties { get; private set; }

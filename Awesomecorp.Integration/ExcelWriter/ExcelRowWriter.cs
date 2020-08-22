@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace Awesomecorp.Integration
+namespace Awesomecorp.Integration.ExcelWriter
 {
 
     public interface IExcelRowWriter<T>
@@ -13,15 +13,19 @@ namespace Awesomecorp.Integration
     }
 
 
+    /// <summary>
+    /// Write rows for type T
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class ExcelRowWriter<T> : IExcelRowWriter<T>
     {
 
-        public ExcelRowWriter(PropertyLister<T> propertyLister)
+        public ExcelRowWriter(IPropertyLister<T> propertyLister)
         {
             PropertyLister = propertyLister;
         }
 
-        public PropertyLister<T> PropertyLister { get; }
+        public IPropertyLister<T> PropertyLister { get; }
 
         public void WriteRow(IXLWorksheet worksheet, T item, int row)
         {
@@ -29,6 +33,7 @@ namespace Awesomecorp.Integration
             foreach(var property in PropertyLister.Properties)
             {
                 WriteCell(worksheet.Row(row).Cell(colIndex), item, property);
+                worksheet.Column(colIndex).AdjustToContents();
                 colIndex++;
             }
             
